@@ -1,156 +1,9 @@
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-
 plugins {
-    alias(libs.plugins.kotlin)
-    alias(libs.plugins.loom)
-    alias(libs.plugins.detekt)
+    alias(libs.plugins.kotlin) apply false
+    alias(libs.plugins.loom) apply false
+    alias(libs.plugins.moddev) apply false
+    alias(libs.plugins.detekt) apply false
     alias(libs.plugins.git.hooks)
-    `maven-publish`
-}
-
-val modId: String by project
-val modName: String by project
-val modVersion: String by project
-val mavenGroup: String by project
-
-base.archivesName.set(modId)
-version = "$modVersion${getVersionMetadata()}"
-group = mavenGroup
-
-sourceSets {
-    create("testmod") {
-        runtimeClasspath += sourceSets["main"].runtimeClasspath
-        compileClasspath += sourceSets["main"].compileClasspath
-    }
-}
-
-loom {
-    //serverOnlyMinecraftJar()
-
-    runs {
-        create("testmodClient") {
-            client()
-            ideConfigGenerated(project.rootProject == project)
-            name("Networking Testmod (Client)")
-            source(sourceSets.getByName("testmod"))
-        }
-    }
-}
-
-fun DependencyHandlerScope.implementationAndInclude(dep: Any) {
-    implementation(dep)
-    include(dep)
-}
-
-repositories {
-    maven("https://maven.fabricmc.net/")
-    maven("https://maven.nucleoid.xyz/")
-    maven("https://jitpack.io")
-    maven("https://oss.sonatype.org/content/repositories/snapshots")
-    mavenCentral()
-}
-
-val includeImplementation: Configuration by configurations.creating {
-    configurations.implementation.configure { extendsFrom(this@creating) }
-}
-
-dependencies {
-    // To change the versions see the libs.versions.toml
-
-    // Fabric
-    minecraft(libs.minecraft)
-    implementation(libs.fabric.loader)
-
-    // Fabric API
-    implementation(libs.fabric.api)
-
-    // Permissions
-    implementationAndInclude(libs.fabric.permissions)
-
-    // Translations
-    implementationAndInclude(libs.translations)
-
-    // Kotlin
-    implementation(libs.fabric.kotlin)
-
-    // Database
-    includeImplementation(libs.exposed.core)
-    includeImplementation(libs.exposed.dao)
-    includeImplementation(libs.exposed.java.time)
-    includeImplementation(libs.exposed.jdbc)
-//    includeImplementation(libs.exposed.migration)
-    includeImplementation(libs.sqlite.jdbc)
-
-    // Config
-    includeImplementation(libs.konf.core)
-    includeImplementation(libs.konf.toml)
-
-    detektPlugins(libs.detekt.formatting)
-}
-
-tasks {
-    processResources {
-        inputs.property("id", modId)
-        inputs.property("name", modName)
-        inputs.property("version", version)
-
-        filesMatching("fabric.mod.json") {
-            expand(
-                mapOf(
-                    "id" to modId,
-                    "version" to version,
-                    "name" to modName,
-                    "fabricApi" to libs.versions.fabric.api.get(),
-                    "fabricKotlin" to libs.versions.fabric.kotlin.get(),
-                    "minecraft" to libs.versions.minecraft.get(),
-                )
-            )
-        }
-    }
-
-    jar {
-        from("LICENSE")
-    }
-}
-
-java {
-    sourceCompatibility = JavaVersion.VERSION_25
-    targetCompatibility = JavaVersion.VERSION_25
-    withSourcesJar()
-}
-
-kotlin {
-    compilerOptions {
-        jvmTarget.set(JvmTarget.JVM_25)
-    }
-}
-
-// configure the maven publication
-publishing {
-    publications {
-        create<MavenPublication>("mavenJava") {
-            artifact(tasks.named("jar"))
-            artifact(tasks.named("sourcesJar"))
-        }
-    }
-
-    // select the repositories you want to publish to
-    repositories {
-        maven {
-            name = "potatoGardenRepository"
-            url = uri("https://maven.potato.garden/releases")
-            credentials(PasswordCredentials::class)
-            authentication {
-                create<BasicAuthentication>("basic")
-            }
-        }
-    }
-}
-
-detekt {
-    buildUponDefaultConfig = true
-    autoCorrect = true
-    config.setFrom(rootProject.files("detekt.yml"))
 }
 
 gitHooks {
@@ -159,58 +12,24 @@ gitHooks {
     )
 }
 
-fun getVersionMetadata(): String {
-    val buildId = System.getenv("GITHUB_RUN_NUMBER")
-    val workflow = System.getenv("GITHUB_WORKFLOW")
-
-    if (workflow == "Release") {
-        return ""
+subprojects {
+    repositories {
+        maven("https://maven.fabricmc.net/")
+        maven("https://maven.nucleoid.xyz/")
+        maven("https://jitpack.io")
+        maven("https://oss.sonatype.org/content/repositories/snapshots")
+        mavenCentral()
     }
 
-    // CI builds only
-    if (buildId != null) {
-        return "+build.$buildId"
-    }
-
-    // No tracking information could be found about the build
-    return "+local"
-}
-
-afterEvaluate {
-    dependencies {
-        handleIncludes(includeImplementation)
-    }
-}
-
-/* Thanks to https://github.com/jakobkmar for original script */
-fun DependencyHandlerScope.includeTransitive(
-    dependencies: Set<ResolvedDependency>,
-    minecraftLibs: Set<ResolvedDependency>,
-    kotlinDependency: ResolvedDependency,
-    checkedDependencies: MutableSet<ResolvedDependency> = HashSet()
-) {
-    dependencies.forEach {
-        if (checkedDependencies.contains(it) || it.moduleGroup == "org.jetbrains.kotlin" || it.moduleGroup == "org.jetbrains.kotlinx") return@forEach
-
-        if (kotlinDependency.children.any { dep -> dep.name == it.name }) {
-            println("Skipping -> ${it.name} (already in fabric-language-kotlin)")
-        } else if (minecraftLibs.any { dep -> dep.moduleGroup == it.moduleGroup && dep.moduleName == it.moduleName }) {
-            println("Skipping -> ${it.name} (already in minecraft)")
-        } else {
-            include(it.name)
-            println("Including -> ${it.name}")
+    pluginManager.withPlugin("java") {
+        extensions.configure<JavaPluginExtension> {
+            toolchain.languageVersion.set(JavaLanguageVersion.of(25))
         }
-        checkedDependencies += it
-
-        includeTransitive(it.children, minecraftLibs, kotlinDependency, checkedDependencies)
     }
-}
 
-fun DependencyHandlerScope.handleIncludes(configuration: Configuration) {
-    includeTransitive(
-        configuration.resolvedConfiguration.firstLevelModuleDependencies,
-        configurations.minecraftLibraries.get().resolvedConfiguration.firstLevelModuleDependencies,
-        configurations.runtimeClasspath.get().resolvedConfiguration.firstLevelModuleDependencies
-            .first { it.moduleGroup == "net.fabricmc" && it.moduleName == "fabric-language-kotlin" },
-    )
+    pluginManager.withPlugin("org.jetbrains.kotlin.jvm") {
+        extensions.configure<org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension> {
+            compilerOptions.jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_25)
+        }
+    }
 }

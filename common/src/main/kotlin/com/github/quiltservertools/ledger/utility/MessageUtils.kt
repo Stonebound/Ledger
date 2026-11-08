@@ -4,9 +4,7 @@ import com.github.quiltservertools.ledger.Ledger
 import com.github.quiltservertools.ledger.actionutils.SearchResults
 import com.github.quiltservertools.ledger.config.SearchSpec
 import com.github.quiltservertools.ledger.database.DatabaseManager
-import com.github.quiltservertools.ledger.network.Networking.hasNetworking
-import com.github.quiltservertools.ledger.network.packet.action.ActionS2CPacket
-import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking
+import com.github.quiltservertools.ledger.platform.LedgerPlatform
 import net.minecraft.commands.CommandSourceStack
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.network.chat.ClickEvent
@@ -30,13 +28,7 @@ object MessageUtils {
     @OptIn(ExperimentalTime::class)
     suspend fun sendSearchResults(source: CommandSourceStack, results: SearchResults, header: Component) {
         // If the player has a Ledger compatible client, we send results as action packets rather than as chat messages
-        if (source.hasPlayer() && source.playerOrException.hasNetworking()) {
-            for (n in results.page..results.pages) {
-                val networkResults = DatabaseManager.searchActions(results.searchParams, n)
-                networkResults.actions.forEach {
-                    ServerPlayNetworking.send(source.playerOrException, ActionS2CPacket(it))
-                }
-            }
+        if (LedgerPlatform.instance.sendSearchResultsToClientMod(source, results)) {
             return
         }
 

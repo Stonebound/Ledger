@@ -13,7 +13,7 @@ import com.github.quiltservertools.ledger.commands.subcommands.StatusCommand
 import com.github.quiltservertools.ledger.commands.subcommands.TeleportCommand
 import com.github.quiltservertools.ledger.utility.BrigadierUtils
 import com.github.quiltservertools.ledger.utility.Dispatcher
-import me.lucko.fabric.api.permissions.v0.Permissions
+import com.github.quiltservertools.ledger.platform.Permissions
 import net.minecraft.commands.Commands.literal
 
 fun registerCommands(dispatcher: Dispatcher) {

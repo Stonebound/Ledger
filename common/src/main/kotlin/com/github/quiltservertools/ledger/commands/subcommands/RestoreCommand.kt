@@ -13,7 +13,7 @@ import com.github.quiltservertools.ledger.utility.TextColorPallet
 import com.github.quiltservertools.ledger.utility.launchMain
 import com.github.quiltservertools.ledger.utility.literal
 import kotlinx.coroutines.launch
-import me.lucko.fabric.api.permissions.v0.Permissions
+import com.github.quiltservertools.ledger.platform.Permissions
 import net.minecraft.commands.Commands
 import net.minecraft.network.chat.Component
 

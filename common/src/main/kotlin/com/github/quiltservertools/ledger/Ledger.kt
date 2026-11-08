@@ -5,7 +5,6 @@ import com.github.quiltservertools.ledger.actionutils.Preview
 import com.github.quiltservertools.ledger.api.ExtensionManager
 import com.github.quiltservertools.ledger.api.LedgerApi
 import com.github.quiltservertools.ledger.api.LedgerApiImpl
-import com.github.quiltservertools.ledger.commands.registerCommands
 import com.github.quiltservertools.ledger.config.CONFIG_PATH
 import com.github.quiltservertools.ledger.config.DatabaseSpec
 import com.github.quiltservertools.ledger.database.ActionQueueService
@@ -14,10 +13,7 @@ import com.github.quiltservertools.ledger.listeners.registerBlockListeners
 import com.github.quiltservertools.ledger.listeners.registerEntityListeners
 import com.github.quiltservertools.ledger.listeners.registerPlayerListeners
 import com.github.quiltservertools.ledger.listeners.registerWorldEventListeners
-import com.github.quiltservertools.ledger.network.Networking
-import com.github.quiltservertools.ledger.network.packet.action.ActionS2CPacket
-import com.github.quiltservertools.ledger.network.packet.handshake.HandshakeS2CPacket
-import com.github.quiltservertools.ledger.network.packet.response.ResponseS2CPacket
+import com.github.quiltservertools.ledger.platform.LedgerPlatform
 import com.github.quiltservertools.ledger.registry.ActionRegistry
 import com.uchuhimo.konf.Config
 import kotlinx.coroutines.CoroutineName
@@ -28,11 +24,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeout
-import net.fabricmc.api.DedicatedServerModInitializer
-import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents
-import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry
-import net.fabricmc.loader.api.FabricLoader
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.resources.Identifier
 import net.minecraft.server.MinecraftServer
@@ -47,7 +38,7 @@ import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 import com.github.quiltservertools.ledger.config.config as realConfig
 
-object Ledger : DedicatedServerModInitializer, CoroutineScope {
+object Ledger : CoroutineScope {
     const val MOD_ID = "ledger"
     val DEFAULT_DATABASE = SQLiteDialect.dialectName
 
@@ -64,29 +55,20 @@ object Ledger : DedicatedServerModInitializer, CoroutineScope {
 
     override val coroutineContext: CoroutineContext = Dispatchers.Default + CoroutineName("Ledger")
 
-    override fun onInitializeServer() {
-        val version = FabricLoader.getInstance().getModContainer(MOD_ID).get().metadata.version
-        logInfo("Initializing Ledger ${version.friendlyString}")
+    fun initialize() {
+        val platform = LedgerPlatform.instance
+        logInfo("Initializing Ledger ${platform.modVersion}")
 
-        if (!Files.exists(FabricLoader.getInstance().configDir.resolve(CONFIG_PATH))) {
+        val configFile = platform.configDir.resolve(CONFIG_PATH)
+        if (!Files.exists(configFile)) {
             logInfo("No config file, Creating")
-            Files.copy(
-                FabricLoader.getInstance().getModContainer(MOD_ID).get().findPath(CONFIG_PATH).get(),
-                FabricLoader.getInstance().configDir.resolve(CONFIG_PATH),
-            )
+            Ledger::class.java.getResourceAsStream("/$CONFIG_PATH")!!.use { Files.copy(it, configFile) }
         }
         realConfig.validateRequired()
         config = realConfig
-
-        ServerLifecycleEvents.SERVER_STARTING.register(::serverStarting)
-        ServerLifecycleEvents.SERVER_STOPPED.register(::serverStopped)
-        CommandRegistrationCallback.EVENT.register { dispatcher, _, _ -> registerCommands(dispatcher) }
-        PayloadTypeRegistry.clientboundPlay().register(ActionS2CPacket.ID, ActionS2CPacket.CODEC)
-        PayloadTypeRegistry.clientboundPlay().register(HandshakeS2CPacket.ID, HandshakeS2CPacket.CODEC)
-        PayloadTypeRegistry.clientboundPlay().register(ResponseS2CPacket.ID, ResponseS2CPacket.CODEC)
     }
 
-    private fun serverStarting(server: MinecraftServer) {
+    fun serverStarting(server: MinecraftServer) {
         this.server = server
         ExtensionManager.serverStarting(server)
         DatabaseManager.setup(ExtensionManager.getDataSource())
@@ -94,7 +76,7 @@ object Ledger : DedicatedServerModInitializer, CoroutineScope {
 
         ActionRegistry.registerDefaultTypes()
         initListeners()
-        Networking
+        LedgerPlatform.instance.onServerStarting()
 
         Ledger.launch {
             val idSet = setOf<Identifier>()
@@ -113,7 +95,7 @@ object Ledger : DedicatedServerModInitializer, CoroutineScope {
         }
     }
 
-    private fun serverStopped(server: MinecraftServer) {
+    fun serverStopped(server: MinecraftServer) {
         runBlocking {
             try {
                 withTimeout(config[DatabaseSpec.queueTimeoutMin].minutes) {

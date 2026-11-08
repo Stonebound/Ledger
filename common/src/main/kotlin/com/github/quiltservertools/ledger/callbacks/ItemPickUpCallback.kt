@@ -1,7 +1,5 @@
 package com.github.quiltservertools.ledger.callbacks
 
-import net.fabricmc.fabric.api.event.Event
-import net.fabricmc.fabric.api.event.EventFactory
 import net.minecraft.world.entity.item.ItemEntity
 import net.minecraft.world.entity.player.Player
 

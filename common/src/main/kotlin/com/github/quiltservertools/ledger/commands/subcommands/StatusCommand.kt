@@ -11,9 +11,8 @@ import com.github.quiltservertools.ledger.utility.TextColorPallet
 import com.github.quiltservertools.ledger.utility.literal
 import com.github.quiltservertools.ledger.utility.translate
 import kotlinx.coroutines.launch
-import me.lucko.fabric.api.permissions.v0.Permissions
-import net.fabricmc.loader.api.FabricLoader
-import net.fabricmc.loader.api.SemanticVersion
+import com.github.quiltservertools.ledger.platform.Permissions
+import com.github.quiltservertools.ledger.platform.LedgerPlatform
 import net.minecraft.commands.Commands
 import net.minecraft.network.chat.ClickEvent
 import net.minecraft.network.chat.Component
@@ -42,7 +41,7 @@ object StatusCommand : BuildableCommand {
             source.sendSystemMessage(
                 Component.translatable(
                     "text.ledger.status.version",
-                    getVersion().friendlyString.literal()
+                    getVersion().literal()
                         .setStyle(TextColorPallet.secondaryVariant),
                 ).setStyle(TextColorPallet.secondary),
             )
@@ -75,7 +74,7 @@ object StatusCommand : BuildableCommand {
                         .withStyle {
                             it.withClickEvent(
                                 ClickEvent.OpenUrl(
-                                    URI("https://www.quiltservertools.net/Ledger/${getVersion().friendlyString}/"),
+                                    URI("https://www.quiltservertools.net/Ledger/${getVersion()}/"),
                                 ),
                             )
                         },
@@ -86,7 +85,5 @@ object StatusCommand : BuildableCommand {
         return 1
     }
 
-    private fun getVersion() = SemanticVersion.parse(
-        FabricLoader.getInstance().getModContainer(Ledger.MOD_ID).get().metadata.version.friendlyString,
-    )
+    private fun getVersion() = LedgerPlatform.instance.modVersion
 }

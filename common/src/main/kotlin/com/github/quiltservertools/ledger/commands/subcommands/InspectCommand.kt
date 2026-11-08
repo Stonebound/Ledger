@@ -8,7 +8,7 @@ import com.github.quiltservertools.ledger.utility.inspectBlock
 import com.github.quiltservertools.ledger.utility.inspectOff
 import com.github.quiltservertools.ledger.utility.inspectOn
 import com.github.quiltservertools.ledger.utility.isInspecting
-import me.lucko.fabric.api.permissions.v0.Permissions
+import com.github.quiltservertools.ledger.platform.Permissions
 import net.minecraft.commands.Commands.argument
 import net.minecraft.commands.Commands.literal
 import net.minecraft.commands.arguments.coordinates.BlockPosArgument

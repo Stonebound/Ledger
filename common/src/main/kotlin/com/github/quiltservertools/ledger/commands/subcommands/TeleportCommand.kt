@@ -4,7 +4,7 @@ import com.github.quiltservertools.ledger.commands.BuildableCommand
 import com.github.quiltservertools.ledger.commands.CommandConsts
 import com.github.quiltservertools.ledger.utility.Context
 import com.github.quiltservertools.ledger.utility.LiteralNode
-import me.lucko.fabric.api.permissions.v0.Permissions
+import com.github.quiltservertools.ledger.platform.Permissions
 import net.minecraft.commands.Commands
 import net.minecraft.commands.arguments.DimensionArgument
 import net.minecraft.commands.arguments.coordinates.Coordinates

@@ -7,7 +7,6 @@ import com.github.quiltservertools.ledger.callbacks.ItemRemoveCallback
 import com.github.quiltservertools.ledger.database.ActionQueueService
 import com.github.quiltservertools.ledger.database.DatabaseManager
 import kotlinx.coroutines.launch
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLevelEvents
 import net.minecraft.core.BlockPos
 import net.minecraft.server.MinecraftServer
 import net.minecraft.server.level.ServerLevel
@@ -17,7 +16,6 @@ import net.minecraft.world.item.ItemStack
 fun registerWorldEventListeners() {
     ItemInsertCallback.EVENT.register(::onItemInsert)
     ItemRemoveCallback.EVENT.register(::onItemRemove)
-    ServerLevelEvents.LOAD.register(::onWorldLoad)
 }
 
 fun onWorldLoad(server: MinecraftServer, world: ServerLevel) {
