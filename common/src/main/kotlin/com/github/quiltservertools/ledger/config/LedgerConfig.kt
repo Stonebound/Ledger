@@ -1,9 +1,9 @@
 package com.github.quiltservertools.ledger.config
 
 import com.github.quiltservertools.ledger.config.util.IdentifierMixin
+import com.github.quiltservertools.ledger.platform.LedgerPlatform
 import com.uchuhimo.konf.Config
 import com.uchuhimo.konf.source.toml
-import com.github.quiltservertools.ledger.platform.LedgerPlatform
 import net.minecraft.resources.Identifier
 
 const val CONFIG_PATH = "ledger.toml"

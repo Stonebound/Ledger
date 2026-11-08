@@ -8,11 +8,11 @@ import com.github.quiltservertools.ledger.commands.arguments.SearchParamArgument
 import com.github.quiltservertools.ledger.config.SearchSpec
 import com.github.quiltservertools.ledger.config.config
 import com.github.quiltservertools.ledger.database.DatabaseManager
+import com.github.quiltservertools.ledger.platform.Permissions
 import com.github.quiltservertools.ledger.utility.Context
 import com.github.quiltservertools.ledger.utility.LiteralNode
 import com.github.quiltservertools.ledger.utility.TextColorPallet
 import kotlinx.coroutines.launch
-import com.github.quiltservertools.ledger.platform.Permissions
 import net.minecraft.commands.Commands.literal
 import net.minecraft.network.chat.Component
 

@@ -2,13 +2,13 @@ package com.github.quiltservertools.ledger.commands.subcommands
 
 import com.github.quiltservertools.ledger.commands.BuildableCommand
 import com.github.quiltservertools.ledger.commands.CommandConsts
+import com.github.quiltservertools.ledger.platform.Permissions
 import com.github.quiltservertools.ledger.utility.Context
 import com.github.quiltservertools.ledger.utility.LiteralNode
 import com.github.quiltservertools.ledger.utility.inspectBlock
 import com.github.quiltservertools.ledger.utility.inspectOff
 import com.github.quiltservertools.ledger.utility.inspectOn
 import com.github.quiltservertools.ledger.utility.isInspecting
-import com.github.quiltservertools.ledger.platform.Permissions
 import net.minecraft.commands.Commands.argument
 import net.minecraft.commands.Commands.literal
 import net.minecraft.commands.arguments.coordinates.BlockPosArgument

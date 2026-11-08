@@ -3,7 +3,6 @@ package com.github.quiltservertools.ledger.utility
 import com.github.quiltservertools.ledger.Ledger
 import com.github.quiltservertools.ledger.actionutils.SearchResults
 import com.github.quiltservertools.ledger.config.SearchSpec
-import com.github.quiltservertools.ledger.database.DatabaseManager
 import com.github.quiltservertools.ledger.platform.LedgerPlatform
 import net.minecraft.commands.CommandSourceStack
 import net.minecraft.nbt.CompoundTag
@@ -24,7 +23,7 @@ import kotlin.time.toKotlinDuration
 object MessageUtils {
     val pageChangeAction: Identifier = Ledger.identifier("page-change")
     val teleportAction: Identifier = Ledger.identifier("teleport")
-    
+
     @OptIn(ExperimentalTime::class)
     suspend fun sendSearchResults(source: CommandSourceStack, results: SearchResults, header: Component) {
         // If the player has a Ledger compatible client, we send results as action packets rather than as chat messages
@@ -42,17 +41,17 @@ object MessageUtils {
             Component.translatable(
                 "text.ledger.footer.search",
                 Component.translatable(
-                    "text.ledger.footer.page_backward"
+                    "text.ledger.footer.page_backward",
                 ).setStyle(TextColorPallet.primaryVariant).withStyle {
-                    val tag: CompoundTag = CompoundTag().apply { this.putInt("page", results.page-1) }
-                    
+                    val tag: CompoundTag = CompoundTag().apply { this.putInt("page", results.page - 1) }
+
                     if (results.page > 1) {
                         it.withHoverEvent(
                             HoverEvent.ShowText(
-                                Component.translatable("text.ledger.footer.page_backward.hover")
-                            )
+                                Component.translatable("text.ledger.footer.page_backward.hover"),
+                            ),
                         ).withClickEvent(
-                            ClickEvent.Custom(pageChangeAction, Optional.of(tag))
+                            ClickEvent.Custom(pageChangeAction, Optional.of(tag)),
                         )
                     } else {
                         Style.EMPTY
@@ -61,23 +60,23 @@ object MessageUtils {
                 results.page.toString().literal().setStyle(TextColorPallet.primaryVariant),
                 results.pages.toString().literal().setStyle(TextColorPallet.primaryVariant),
                 Component.translatable(
-                    "text.ledger.footer.page_forward"
+                    "text.ledger.footer.page_forward",
                 ).setStyle(TextColorPallet.primaryVariant).withStyle {
-                    val tag: CompoundTag = CompoundTag().apply { this.putInt("page", results.page+1) }
+                    val tag: CompoundTag = CompoundTag().apply { this.putInt("page", results.page + 1) }
 
                     if (results.page < results.pages) {
                         it.withHoverEvent(
                             HoverEvent.ShowText(
-                                Component.translatable("text.ledger.footer.page_forward.hover")
-                            )
+                                Component.translatable("text.ledger.footer.page_forward.hover"),
+                            ),
                         ).withClickEvent(
-                            ClickEvent.Custom(pageChangeAction, Optional.of(tag))
+                            ClickEvent.Custom(pageChangeAction, Optional.of(tag)),
                         )
                     } else {
                         Style.EMPTY
                     }
-                }
-            ).setStyle(TextColorPallet.primary)
+                },
+            ).setStyle(TextColorPallet.primary),
         )
     }
 
@@ -127,8 +126,8 @@ object MessageUtils {
         message.withStyle {
             it.withHoverEvent(
                 HoverEvent.ShowText(
-                    timeMessage
-                )
+                    timeMessage,
+                ),
             )
         }
         return message

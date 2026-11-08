@@ -36,8 +36,7 @@ class FabricPlatform : LedgerPlatform {
     override fun hasPermission(source: CommandSourceStack, node: String, level: Int) =
         Permissions.check(source, node, level)
 
-    override fun hasPermission(player: ServerPlayer, node: String, level: Int) =
-        Permissions.check(player, node, level)
+    override fun hasPermission(player: ServerPlayer, node: String, level: Int) = Permissions.check(player, node, level)
 
     override fun onServerStarting() {
         PlayerBlockBreakEvents.AFTER.register(::onBlockBreak)
