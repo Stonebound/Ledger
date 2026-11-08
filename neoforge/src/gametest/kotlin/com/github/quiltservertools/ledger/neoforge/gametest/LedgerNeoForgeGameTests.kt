@@ -1,13 +1,17 @@
 package com.github.quiltservertools.ledger.neoforge.gametest
 
+import com.github.quiltservertools.ledger.database.MAX_PLAYER_NAME_LENGTH
 import com.github.quiltservertools.ledger.gametest.Expected
 import com.github.quiltservertools.ledger.gametest.SHARED_SCENARIOS
 import com.github.quiltservertools.ledger.gametest.Scenario
 import com.github.quiltservertools.ledger.gametest.guarded
 import com.github.quiltservertools.ledger.gametest.succeedIfNotLogged
+import com.github.quiltservertools.ledger.gametest.succeedWhenLogged
+import com.github.quiltservertools.ledger.gametest.uniqueName
 import com.github.quiltservertools.ledger.gametest.uniqueMockPlayer
 import com.github.quiltservertools.ledger.neoforge.ServerTranslations
 import com.github.quiltservertools.ledger.platform.Permissions
+import com.mojang.authlib.GameProfile
 import net.minecraft.core.BlockPos
 import net.minecraft.core.registries.Registries
 import net.minecraft.gametest.framework.FunctionGameTestInstance
@@ -25,10 +29,12 @@ import net.neoforged.api.distmarker.Dist
 import net.neoforged.bus.api.IEventBus
 import net.neoforged.fml.common.Mod
 import net.neoforged.neoforge.common.NeoForge
+import net.neoforged.neoforge.common.util.FakePlayerFactory
 import net.neoforged.neoforge.event.RegisterGameTestsEvent
 import net.neoforged.neoforge.event.level.block.BreakBlockEvent
 import net.neoforged.neoforge.registries.DeferredRegister
 import java.util.Optional
+import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
 import java.util.function.Consumer
 import java.util.function.Supplier
@@ -58,6 +64,24 @@ private val NEOFORGE_SCENARIOS = listOf(
         helper.assertTrue(!destroyed, Component.literal("the break should have been cancelled"))
         helper.assertBlockPresent(Blocks.STONE, pos)
         helper.succeedIfNotLogged(pos, Expected(action = "block-break"))
+    },
+    Scenario("fake_player_is_logged") { helper ->
+        // Machines from other mods act through fake players, which never join the server.
+        val name = uniqueName("fake")
+        val fake = FakePlayerFactory.get(helper.level, GameProfile(UUID.randomUUID(), name))
+        val pos = BlockPos(5, 2, 5)
+        helper.setBlock(pos, Blocks.STONE)
+        fake.gameMode.destroyBlock(helper.absolutePos(pos))
+        helper.succeedWhenLogged(pos, Expected("block-break", player = name))
+    },
+    Scenario("fake_player_with_a_long_name_is_logged") { helper ->
+        // Unlike real players' names, these can be longer than the database column.
+        val name = "[Machine From A Mod ${uniqueName()}]"
+        val fake = FakePlayerFactory.get(helper.level, GameProfile(UUID.randomUUID(), name))
+        val pos = BlockPos(5, 2, 5)
+        helper.setBlock(pos, Blocks.STONE)
+        fake.gameMode.destroyBlock(helper.absolutePos(pos))
+        helper.succeedWhenLogged(pos, Expected("block-break", player = name.take(MAX_PLAYER_NAME_LENGTH)))
     },
     Scenario("translations") { helper ->
         helper.assertText(

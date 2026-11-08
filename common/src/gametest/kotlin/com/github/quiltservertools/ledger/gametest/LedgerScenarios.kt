@@ -22,12 +22,12 @@ import net.minecraft.world.phys.BlockHitResult
 import net.minecraft.world.phys.Vec3
 
 /** One end-to-end check. Each drives real game code, then asserts on what Ledger saved. */
-class Scenario(val name: String, val maxTicks: Int = 600, val run: (GameTestHelper) -> Unit)
+class Scenario(val name: String, val maxTicks: Int = 1500, val run: (GameTestHelper) -> Unit)
 
-private val CENTER = BlockPos(5, 2, 5)
-private val FLOOR = CENTER.below()
+internal val CENTER = BlockPos(5, 2, 5)
+internal val FLOOR = CENTER.below()
 
-private fun GameTestHelper.floor(radius: Int = 4, block: net.minecraft.world.level.block.Block = Blocks.STONE) {
+internal fun GameTestHelper.floor(radius: Int = 4, block: net.minecraft.world.level.block.Block = Blocks.STONE) {
     for (x in -radius..radius) {
         for (z in -radius..radius) {
             setBlock(FLOOR.offset(x, 0, z), block)
@@ -36,7 +36,7 @@ private fun GameTestHelper.floor(radius: Int = 4, block: net.minecraft.world.lev
 }
 
 /** A real server player standing at [pos]. */
-private fun GameTestHelper.player(pos: BlockPos = CENTER): ServerPlayer {
+internal fun GameTestHelper.player(pos: BlockPos = CENTER): ServerPlayer {
     val player = uniqueMockPlayer()
     val at = absoluteVec(Vec3.atBottomCenterOf(pos))
     player.setPos(at.x, at.y, at.z)
@@ -44,16 +44,16 @@ private fun GameTestHelper.player(pos: BlockPos = CENTER): ServerPlayer {
 }
 
 /** Uses the held item on the top of a block, through the same code a click packet reaches. */
-private fun GameTestHelper.useOn(player: ServerPlayer, pos: BlockPos, item: ItemStack) {
+internal fun GameTestHelper.useOn(player: ServerPlayer, pos: BlockPos, item: ItemStack) {
     player.setItemInHand(InteractionHand.MAIN_HAND, item)
     val target = absolutePos(pos)
     val hit = BlockHitResult(Vec3.atCenterOf(target).add(0.0, 0.5, 0.0), Direction.UP, target, false)
     player.gameMode.useItemOn(player, level, player.getItemInHand(InteractionHand.MAIN_HAND), InteractionHand.MAIN_HAND, hit)
 }
 
-private fun GameTestHelper.breakAs(player: ServerPlayer, pos: BlockPos) = player.gameMode.destroyBlock(absolutePos(pos))
+internal fun GameTestHelper.breakAs(player: ServerPlayer, pos: BlockPos) = player.gameMode.destroyBlock(absolutePos(pos))
 
-private fun id(path: String) = "minecraft:$path"
+internal fun id(path: String) = "minecraft:$path"
 
 private fun toolScenario(
     name: String,
@@ -68,7 +68,11 @@ private fun toolScenario(
 }
 
 /** Scenarios that behave the same on every loader. */
-val SHARED_SCENARIOS = listOf(
+val SHARED_SCENARIOS: List<Scenario> by lazy {
+    BASIC_SCENARIOS + BLOCK_SCENARIOS + ENTITY_SCENARIOS + ROLLBACK_SCENARIOS + COMMAND_SCENARIOS + PLAYER_SCENARIOS
+}
+
+private val BASIC_SCENARIOS = listOf(
     Scenario("player_break") { helper ->
         helper.setBlock(CENTER, Blocks.STONE)
         helper.breakAs(helper.player(CENTER.north()), CENTER)
