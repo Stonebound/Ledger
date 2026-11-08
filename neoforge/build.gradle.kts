@@ -69,8 +69,10 @@ dependencies {
         add("jarJar", it)
     }
 
-    // jarJar does not bundle dependencies of dependencies, so Konf's are listed explicitly.
+    // jarJar does not bundle dependencies of dependencies, so Exposed's and Konf's are listed explicitly.
+    // Anything else in their trees is provided by Minecraft or Kotlin for Forge. Missing ones only fail in packaged jars.
     listOf(
+        "org.jetbrains.kotlinx:kotlinx-datetime-jvm:0.7.1-0.6.x-compat",
         "com.fasterxml.jackson.core:jackson-annotations:2.12.2",
         "com.fasterxml.jackson.core:jackson-core:2.12.2",
         "com.fasterxml.jackson.core:jackson-databind:2.12.2",
