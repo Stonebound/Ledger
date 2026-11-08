@@ -2,7 +2,10 @@ package com.github.quiltservertools.ledger.platform
 
 import com.github.quiltservertools.ledger.actionutils.SearchResults
 import net.minecraft.commands.CommandSourceStack
+import net.minecraft.core.BlockPos
+import net.minecraft.server.level.ServerLevel
 import net.minecraft.server.level.ServerPlayer
+import net.minecraft.world.item.ItemStack
 import java.nio.file.Path
 import java.util.ServiceLoader
 
@@ -20,6 +23,12 @@ interface LedgerPlatform {
 
     /** Sends results to a compatible client mod. Returns false if the source doesn't have one. */
     suspend fun sendSearchResultsToClientMod(source: CommandSourceStack, results: SearchResults): Boolean
+
+    /** Adds items back to storage that only this loader can reach. Returns false if that isn't possible. */
+    fun insertIntoStorage(level: ServerLevel, pos: BlockPos, stack: ItemStack, marker: String?): Boolean = false
+
+    /** Takes items from storage that only this loader can reach. Returns false if that isn't possible. */
+    fun extractFromStorage(level: ServerLevel, pos: BlockPos, stack: ItemStack, marker: String?): Boolean = false
 
     companion object {
         @JvmStatic

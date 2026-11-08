@@ -97,6 +97,13 @@ fun onBlockBreak(world: Level, player: Player, pos: BlockPos, state: BlockState,
     )
 }
 
+/** For a block entity whose data had to be saved before it was broken. */
+fun onBlockBreak(world: Level, player: Player, pos: BlockPos, state: BlockState, savedData: String) {
+    val action = ActionFactory.blockBreakAction(world, pos, state, player)
+    action.extraData = savedData
+    ActionQueueService.addToQueue(action)
+}
+
 private fun onItemPickUp(entity: ItemEntity, player: Player) {
     ActionQueueService.addToQueue(ActionFactory.itemPickUpAction(entity, player))
 }

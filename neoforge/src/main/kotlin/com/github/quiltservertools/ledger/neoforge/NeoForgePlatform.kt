@@ -7,12 +7,15 @@ import com.github.quiltservertools.ledger.listeners.onJoin
 import com.github.quiltservertools.ledger.listeners.onUseBlock
 import com.github.quiltservertools.ledger.listeners.onWorldLoad
 import com.github.quiltservertools.ledger.logWarn
+import com.github.quiltservertools.ledger.neoforge.storage.ModdedStorage
 import com.github.quiltservertools.ledger.platform.LedgerPlatform
 import net.minecraft.commands.CommandSourceStack
+import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.InteractionResult
+import net.minecraft.world.item.ItemStack
 import net.neoforged.fml.ModList
 import net.neoforged.fml.loading.FMLPaths
 import net.neoforged.neoforge.common.NeoForge
@@ -67,6 +70,12 @@ class NeoForgePlatform : LedgerPlatform {
             }
         }
     }
+
+    override fun insertIntoStorage(level: ServerLevel, pos: BlockPos, stack: ItemStack, marker: String?) =
+        ModdedStorage.insert(level, pos, stack, marker)
+
+    override fun extractFromStorage(level: ServerLevel, pos: BlockPos, stack: ItemStack, marker: String?) =
+        ModdedStorage.extract(level, pos, stack, marker)
 
     // Ledger's client mod protocol isn't available on NeoForge yet, so results always go to chat.
     override suspend fun sendSearchResultsToClientMod(source: CommandSourceStack, results: SearchResults) = false

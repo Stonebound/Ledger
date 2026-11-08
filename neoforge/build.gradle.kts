@@ -1,3 +1,5 @@
+import java.security.MessageDigest
+
 plugins {
     id("org.jetbrains.kotlin.jvm")
     id("net.neoforged.moddev")
@@ -64,6 +66,13 @@ neoForge {
             gameDirectory = file("runs/gametest")
             systemProperty("neoforge.enabledGameTestNamespaces", "ledger_gametest")
         }
+        // The same tests with real storage mods loaded, which adds the scenarios for those mods. Slower, so it's separate.
+        create("storageGameTests") {
+            type = "gameTestServer"
+            sourceSet = gametest
+            gameDirectory = file("runs/storagetest")
+            systemProperty("neoforge.enabledGameTestNamespaces", "ledger_gametest")
+        }
     }
 }
 
@@ -74,8 +83,43 @@ tasks.named("runGameTests") {
     }
 }
 
+// Mods for the storage tests, at the versions used by FTB Evolution 2. Downloaded rather than kept in this repository.
+val downloadStorageTestMods by tasks.registering {
+    val listing = file("storage-test-mods.json")
+    val modsDir = file("runs/storagetest/mods")
+    inputs.file(listing)
+    outputs.dir(modsDir)
+    doLast {
+        @Suppress("UNCHECKED_CAST")
+        val mods = groovy.json.JsonSlurper().parse(listing) as List<Map<String, String>>
+        modsDir.mkdirs()
+        val wanted = mods.map { it.getValue("file") }.toSet()
+        modsDir.listFiles()?.filter { it.name !in wanted }?.forEach { it.delete() }
+        mods.forEach { mod ->
+            val target = modsDir.resolve(mod.getValue("file"))
+            fun sha1(bytes: ByteArray) = MessageDigest.getInstance("SHA-1").digest(bytes)
+                .joinToString("") { "%02x".format(it) }
+            if (!target.exists() || sha1(target.readBytes()) != mod.getValue("sha1")) {
+                val bytes = uri(mod.getValue("url")).toURL().openStream().use { it.readBytes() }
+                check(sha1(bytes) == mod.getValue("sha1")) { "Checksum mismatch for ${mod.getValue("file")}" }
+                target.writeBytes(bytes)
+            }
+        }
+    }
+}
+
+tasks.named("runStorageGameTests") {
+    dependsOn(downloadStorageTestMods)
+    doFirst {
+        delete(fileTree("runs/storagetest") { include("**/*"); exclude("mods/**") })
+    }
+}
+
 repositories {
     maven("https://thedarkcolour.github.io/KotlinForForge/")
+    maven("https://api.modrinth.com/maven") {
+        content { includeGroup("maven.modrinth") }
+    }
 }
 
 // Runtime scanning library that Konf pulls in; jarJar rejects it and Ledger's Konf calls don't need it.
@@ -113,6 +157,17 @@ dependencies {
         "org.apache.commons:commons-text:1.9",
     ).forEach { add("jarJar", it) }
     add("jarJar", project(":toml4j-module"))
+
+    // Storage mods Ledger has code for, which only runs if they're installed. Same versions as storage-test-mods.json.
+    listOf(
+        "maven.modrinth:ae2:26.1.13-beta",
+        "maven.modrinth:refined-storage:3.2.1",
+        "maven.modrinth:sophisticated-backpacks:26.1.2-3.26.18.2238",
+        "maven.modrinth:sophisticated-core:26.1.2-1.5.28.2455",
+    ).forEach {
+        compileOnly(it)
+        add("gametestCompileOnly", it)
+    }
 
     detektPlugins(libs.detekt.formatting)
 }

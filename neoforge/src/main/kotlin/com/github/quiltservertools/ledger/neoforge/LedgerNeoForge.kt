@@ -2,6 +2,7 @@ package com.github.quiltservertools.ledger.neoforge
 
 import com.github.quiltservertools.ledger.Ledger
 import com.github.quiltservertools.ledger.commands.registerCommands
+import com.github.quiltservertools.ledger.neoforge.storage.StorageTracker
 import net.neoforged.api.distmarker.Dist
 import net.neoforged.fml.common.Mod
 import net.neoforged.neoforge.common.NeoForge
@@ -25,5 +26,6 @@ class LedgerNeoForge {
             NeoForgePermissions.nodes.values.forEach { event.addNodes(it) }
         }
         bus.addListener(ServerStartedEvent::class.java) { Ledger.auditMixinsIfRequested() }
+        StorageTracker.register(bus)
     }
 }

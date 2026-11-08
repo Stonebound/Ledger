@@ -3,7 +3,9 @@
     "package": "com.github.quiltservertools.ledger.neoforge.mixin",
     "mixins": [
         "MinecraftServerMixin",
+        "PacketProcessorMixin",
         "ServerCommonPacketListenerImplMixin",
+        "ServerPayloadContextMixin",
         "ServerPlayerGameModeMixin",
         "ShearsItemMixin"
     ],

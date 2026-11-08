@@ -1,0 +1,82 @@
+[
+  {
+    "file": "ae2wtlib-26.1.2-beta.jar",
+    "url": "https://edge.forgecdn.net/files/9149/560/ae2wtlib-26.1.2-beta.jar",
+    "sha1": "a7286ffb0c5efa618ab1d82a73c0bb32aa054298"
+  },
+  {
+    "file": "appliedenergistics2-26.1.13-beta.jar",
+    "url": "https://edge.forgecdn.net/files/9022/271/appliedenergistics2-26.1.13-beta.jar",
+    "sha1": "e549080c2b6e1b44bee8fa8cf2b07f4e454d9e40"
+  },
+  {
+    "file": "commoncapabilities-26.1.2-neoforge-2.11.8.jar",
+    "url": "https://edge.forgecdn.net/files/8247/192/commoncapabilities-26.1.2-neoforge-2.11.8.jar",
+    "sha1": "c24e162202ef1a35d68714bcc1eca0d6a60978ab"
+  },
+  {
+    "file": "cyclopscore-26.1.2-neoforge-1.31.4.jar",
+    "url": "https://edge.forgecdn.net/files/9383/680/cyclopscore-26.1.2-neoforge-1.31.4.jar",
+    "sha1": "552beaa7d832c7a7bc5508f8e34dd92de0f899f0"
+  },
+  {
+    "file": "dankstorage-neoforge-26.1.2-2.jar",
+    "url": "https://edge.forgecdn.net/files/9262/867/dankstorage-neoforge-26.1.2-2.jar",
+    "sha1": "f1f82a0238c45adfe4559c8b4b8624e901ca9ea2"
+  },
+  {
+    "file": "functionalstorage-26.1.2-1.6.4.jar",
+    "url": "https://edge.forgecdn.net/files/9180/205/functionalstorage-26.1.2-1.6.4.jar",
+    "sha1": "9fce7966113d94a5b65d0f7e345b18d4a4513f92"
+  },
+  {
+    "file": "guideme-26.1.17-beta.jar",
+    "url": "https://edge.forgecdn.net/files/9366/331/guideme-26.1.17-beta.jar",
+    "sha1": "856a13f4373cfb6edd97a1c5959f5a0010e4eec5"
+  },
+  {
+    "file": "integrateddynamics-26.1.2-neoforge-1.36.3.jar",
+    "url": "https://edge.forgecdn.net/files/9385/161/integrateddynamics-26.1.2-neoforge-1.36.3.jar",
+    "sha1": "1d89c12912d6fd70b68d3c9fc734196d89a329e1"
+  },
+  {
+    "file": "integratedterminals-26.1.2-neoforge-1.11.1.jar",
+    "url": "https://edge.forgecdn.net/files/9220/303/integratedterminals-26.1.2-neoforge-1.11.1.jar",
+    "sha1": "4d3d07e691c9c2ef6ed448c0db313493499aae27"
+  },
+  {
+    "file": "lootr-neoforge-26.1.2-1.23.38.123.jar",
+    "url": "https://edge.forgecdn.net/files/8977/39/lootr-neoforge-26.1.2-1.23.38.123.jar",
+    "sha1": "ac88bb101870900189beefa3d6b18be36bdef423"
+  },
+  {
+    "file": "refinedstorage-neoforge-3.2.1.jar",
+    "url": "https://edge.forgecdn.net/files/8211/383/refinedstorage-neoforge-3.2.1.jar",
+    "sha1": "1bd09d5e51f82418d8602dec1e8fc6883beb852d"
+  },
+  {
+    "file": "sophisticatedbackpacks-26.1.2-3.26.18.2238.jar",
+    "url": "https://edge.forgecdn.net/files/9373/682/sophisticatedbackpacks-26.1.2-3.26.18.2238.jar",
+    "sha1": "678dee4fc918049ac40a74c1267fecd582d73a68"
+  },
+  {
+    "file": "sophisticatedcore-26.1.2-1.5.28.2455.jar",
+    "url": "https://edge.forgecdn.net/files/9431/772/sophisticatedcore-26.1.2-1.5.28.2455.jar",
+    "sha1": "af7212a2d6b3dbde94db0e074d26a17ffb2d5d32"
+  },
+  {
+    "file": "sophisticatedstorage-26.1.2-1.5.129.2218.jar",
+    "url": "https://edge.forgecdn.net/files/9409/319/sophisticatedstorage-26.1.2-1.5.129.2218.jar",
+    "sha1": "dbebcc2bb09783ec191d9964eccd75d84c9d6f00"
+  },
+  {
+    "file": "titanium-26.1.2-4.0.16.jar",
+    "url": "https://edge.forgecdn.net/files/9341/907/titanium-26.1.2-4.0.16.jar",
+    "sha1": "51d54f16f26299c54bb57708bca146d5e43f8410"
+  },
+  {
+    "file": "ToolBelt-26.1.2-2.9.5.jar",
+    "url": "https://edge.forgecdn.net/files/7927/463/ToolBelt-26.1.2-2.9.5.jar",
+    "sha1": "e69899edb5a1b8919d9a55a5b16d21158f766b8b"
+  }
+]

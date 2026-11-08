@@ -44,6 +44,9 @@ data class Expected(
 }
 
 private val mockPlayerCount = AtomicInteger()
+
+/** Lets a loader prepare a mock player's connection, since other mods may send it packets as it joins. */
+var prepareMockConnection: (Connection) -> Unit = {}
 private val lastPollTick = AtomicLong(-1)
 
 /**
@@ -68,6 +71,7 @@ fun GameTestHelper.uniqueMockPlayer(name: String = uniqueName(), gameType: GameT
     }
     val connection = Connection(PacketFlow.SERVERBOUND)
     EmbeddedChannel(connection)
+    prepareMockConnection(connection)
     server.playerList.placeNewPlayer(connection, player, cookie)
     return player
 }

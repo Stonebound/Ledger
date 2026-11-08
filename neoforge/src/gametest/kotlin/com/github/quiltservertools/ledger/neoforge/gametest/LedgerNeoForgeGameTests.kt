@@ -5,6 +5,7 @@ import com.github.quiltservertools.ledger.gametest.Expected
 import com.github.quiltservertools.ledger.gametest.SHARED_SCENARIOS
 import com.github.quiltservertools.ledger.gametest.Scenario
 import com.github.quiltservertools.ledger.gametest.guarded
+import com.github.quiltservertools.ledger.gametest.prepareMockConnection
 import com.github.quiltservertools.ledger.gametest.succeedIfNotLogged
 import com.github.quiltservertools.ledger.gametest.succeedWhenLogged
 import com.github.quiltservertools.ledger.gametest.uniqueName
@@ -32,6 +33,7 @@ import net.neoforged.neoforge.common.NeoForge
 import net.neoforged.neoforge.common.util.FakePlayerFactory
 import net.neoforged.neoforge.event.RegisterGameTestsEvent
 import net.neoforged.neoforge.event.level.block.BreakBlockEvent
+import net.neoforged.neoforge.network.registration.NetworkRegistry
 import net.neoforged.neoforge.registries.DeferredRegister
 import java.util.Optional
 import java.util.UUID
@@ -132,7 +134,8 @@ private val NEOFORGE_SCENARIOS = listOf(
 @Mod(value = MOD_ID, dist = [Dist.DEDICATED_SERVER])
 class LedgerNeoForgeGameTests(modBus: IEventBus) {
     init {
-        val scenarios = SHARED_SCENARIOS + NEOFORGE_SCENARIOS
+        prepareMockConnection = NetworkRegistry::configureMockConnection
+        val scenarios = SHARED_SCENARIOS + NEOFORGE_SCENARIOS + storageScenarios()
 
         val functions = DeferredRegister.create(Registries.TEST_FUNCTION, MOD_ID)
         scenarios.forEach { scenario ->

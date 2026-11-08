@@ -1,6 +1,7 @@
 package com.github.quiltservertools.ledger.actions
 
 import com.github.quiltservertools.ledger.actionutils.Preview
+import com.github.quiltservertools.ledger.platform.LedgerPlatform
 import com.github.quiltservertools.ledger.utility.NbtUtils
 import com.github.quiltservertools.ledger.utility.TextColorPallet
 import com.github.quiltservertools.ledger.utility.addItem
@@ -95,7 +96,7 @@ abstract class ItemChangeActionType : AbstractActionType() {
 
         if (world != null) {
             val rollbackStack = getStack(server)
-            if (inventory != null) {
+            if (inventory != null && objectState == null) {
                 return removeMatchingItem(rollbackStack, inventory)
             } else if (rollbackStack.`is`(Items.WRITABLE_BOOK) || rollbackStack.`is`(Items.WRITTEN_BOOK)) {
                 val blockEntity = world.getBlockEntity(pos)
@@ -105,6 +106,7 @@ abstract class ItemChangeActionType : AbstractActionType() {
                     return true
                 }
             }
+            return LedgerPlatform.instance.extractFromStorage(world, pos, rollbackStack, objectState)
         }
 
         return false
@@ -116,7 +118,7 @@ abstract class ItemChangeActionType : AbstractActionType() {
 
         if (world != null) {
             val rollbackStack = getStack(server)
-            if (inventory != null) {
+            if (inventory != null && objectState == null) {
                 return addItem(rollbackStack, inventory)
             } else if (rollbackStack.`is`(Items.WRITABLE_BOOK) || rollbackStack.`is`(Items.WRITTEN_BOOK)) {
                 val blockEntity = world.getBlockEntity(pos)
@@ -126,6 +128,7 @@ abstract class ItemChangeActionType : AbstractActionType() {
                     return true
                 }
             }
+            return LedgerPlatform.instance.insertIntoStorage(world, pos, rollbackStack, objectState)
         }
 
         return false
