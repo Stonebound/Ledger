@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "id": "ledger_gametest",
+  "version": "0.0.0",
+  "name": "Ledger GameTests",
+  "description": "End-to-end tests. Dev runs only, never shipped.",
+  "license": "LGPL",
+  "environment": "server",
+  "entrypoints": {
+    "fabric-gametest": ["com.github.quiltservertools.ledger.fabric.gametest.LedgerFabricGameTests"]
+  },
+  "depends": {
+    "ledger": "*"
+  }
+}

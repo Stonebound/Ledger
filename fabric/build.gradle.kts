@@ -28,6 +28,15 @@ sourceSets {
         runtimeClasspath += sourceSets["main"].runtimeClasspath
         compileClasspath += sourceSets["main"].compileClasspath
     }
+    // End-to-end tests, in their own mod so they never reach the release jar. Scenarios are shared with other loaders.
+    create("gametest") {
+        runtimeClasspath += sourceSets["main"].runtimeClasspath
+        compileClasspath += sourceSets["main"].compileClasspath + sourceSets["main"].output
+        resources.srcDir(common.file("src/gametest/resources"))
+    }
+}
+kotlin.sourceSets.named("gametest") {
+    kotlin.srcDir(common.file("src/gametest/kotlin"))
 }
 
 loom {
@@ -38,6 +47,14 @@ loom {
             vmArg("-Dledger.auditMixins=true")
             vmArg("-Dmixin.debug.verify=true")
             vmArg("-Dmixin.debug.countInjections=true")
+        }
+        // Starts a server, runs every test, and exits with a failure if any test failed.
+        create("gameTests") {
+            server()
+            name("Ledger GameTests")
+            source(sourceSets.getByName("gametest"))
+            runDir("runs/gametest")
+            vmArg("-Dfabric-api.gametest")
         }
         create("testmodClient") {
             client()
@@ -124,6 +141,13 @@ detekt {
     buildUponDefaultConfig = true
     autoCorrect = true
     config.setFrom(rootProject.files("detekt.yml"))
+}
+
+// Tests assert on Ledger's database, so a leftover one could make them pass falsely.
+tasks.named("runGameTests") {
+    doFirst {
+        delete(fileTree("runs/gametest") { include("**/*") })
+    }
 }
 
 // Lets console commands such as "stop" reach a server started through Gradle.

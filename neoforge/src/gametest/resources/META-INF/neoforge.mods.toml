@@ -1,0 +1,16 @@
+modLoader = "javafml"
+loaderVersion = "[1,)"
+license = "LGPL-3.0"
+
+[[mods]]
+modId = "ledger_gametest"
+version = "0.0.0"
+displayName = "Ledger GameTests"
+description = "End-to-end tests. Dev runs only, never shipped."
+
+[[dependencies.ledger_gametest]]
+modId = "ledger"
+type = "required"
+versionRange = "[0,)"
+ordering = "AFTER"
+side = "SERVER"

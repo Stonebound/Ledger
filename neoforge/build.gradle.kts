@@ -23,22 +23,54 @@ kotlin.sourceSets.main {
     kotlin.srcDir(common.file("src/main/kotlin"))
 }
 
+// End-to-end tests, in their own mod so they never reach the release jar. Scenarios are shared with other loaders.
+val gametest: SourceSet by sourceSets.creating {
+    compileClasspath += sourceSets.main.get().output
+    runtimeClasspath += sourceSets.main.get().output
+    resources.srcDir(common.file("src/gametest/resources"))
+}
+kotlin.sourceSets.named("gametest") {
+    kotlin.srcDir(common.file("src/gametest/kotlin"))
+}
+configurations.named("gametestImplementation") {
+    extendsFrom(configurations.implementation.get())
+}
+
 neoForge {
     version = "26.1.2.126"
+    addModdingDependenciesTo(gametest)
+    mods {
+        create(modId) {
+            sourceSet(sourceSets.main.get())
+        }
+        create("ledger_gametest") {
+            sourceSet(gametest)
+        }
+    }
     runs {
         create("server") {
             server()
             gameDirectory = file("runs/server")
             programArgument("--nogui")
+            loadedMods.set(listOf(mods.getByName(modId)))
             systemProperty("ledger.auditMixins", "true")
             systemProperty("mixin.debug.verify", "true")
             systemProperty("mixin.debug.countInjections", "true")
         }
-    }
-    mods {
-        create(modId) {
-            sourceSet(sourceSets.main.get())
+        // Starts a server, runs every test, and exits with the number of failed tests.
+        create("gameTests") {
+            type = "gameTestServer"
+            sourceSet = gametest
+            gameDirectory = file("runs/gametest")
+            systemProperty("neoforge.enabledGameTestNamespaces", "ledger_gametest")
         }
+    }
+}
+
+// Tests assert on Ledger's database, so a leftover one could make them pass falsely.
+tasks.named("runGameTests") {
+    doFirst {
+        delete(fileTree("runs/gametest") { include("**/*") })
     }
 }
 
