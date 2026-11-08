@@ -15,6 +15,7 @@ class LedgerFabric : DedicatedServerModInitializer {
         Ledger.initialize()
 
         ServerLifecycleEvents.SERVER_STARTING.register(Ledger::serverStarting)
+        ServerLifecycleEvents.SERVER_STARTED.register { Ledger.auditMixinsIfRequested() }
         ServerLifecycleEvents.SERVER_STOPPED.register(Ledger::serverStopped)
         CommandRegistrationCallback.EVENT.register { dispatcher, _, _ -> registerCommands(dispatcher) }
         PayloadTypeRegistry.clientboundPlay().register(ActionS2CPacket.ID, ActionS2CPacket.CODEC)

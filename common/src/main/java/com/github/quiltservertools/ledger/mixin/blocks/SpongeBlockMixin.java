@@ -5,6 +5,7 @@ import com.github.quiltservertools.ledger.callbacks.BlockChangeCallback;
 import com.github.quiltservertools.ledger.utility.Sources;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.SpongeBlock;
+import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import org.spongepowered.asm.mixin.Mixin;
@@ -22,14 +23,14 @@ public abstract class SpongeBlockMixin {
 
     @Inject(method = "lambda$removeWaterBreadthFirstSearch$1", at = @At(value = "INVOKE",
             target = "Lnet/minecraft/world/level/Level;setBlock(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;I)Z"))
-    private static void logWaterDrainNonSource(BlockPos actorBlockPos, Level world, BlockPos pos, CallbackInfoReturnable<Boolean> cir) {
+    private static void logWaterDrainNonSource(CallbackInfoReturnable<Boolean> cir, @Local(argsOnly = true) Level world, @Local(argsOnly = true, ordinal = 1) BlockPos pos) {
         // pos is the blockpos for affected water
         BlockBreakCallback.EVENT.invoker().breakBlock(world, pos, world.getBlockState(pos), null, Sources.SPONGE);
     }
 
     @Inject(method = "lambda$removeWaterBreadthFirstSearch$1", at = @At(value = "INVOKE",
             target = "Lnet/minecraft/world/level/block/BucketPickup;pickupBlock(Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/level/LevelAccessor;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;)Lnet/minecraft/world/item/ItemStack;"))
-    private static void logWaterDrainSource(BlockPos actorBlockPos, Level world, BlockPos pos, CallbackInfoReturnable<Boolean> cir) {
+    private static void logWaterDrainSource(CallbackInfoReturnable<Boolean> cir, @Local(argsOnly = true) Level world, @Local(argsOnly = true, ordinal = 1) BlockPos pos) {
         BlockBreakCallback.EVENT.invoker().breakBlock(world, pos, world.getBlockState(pos), null, Sources.SPONGE);
     }
 

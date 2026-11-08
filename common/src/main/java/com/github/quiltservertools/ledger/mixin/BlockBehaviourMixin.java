@@ -23,9 +23,15 @@ public abstract class BlockBehaviourMixin {
 
     @Inject(
             method = "onExplosionHit",
-            at = @At(
-                    value = "INVOKE", target = "Lnet/minecraft/server/level/ServerLevel;setBlock(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;I)Z"
-            )
+            at = {
+                    @At(
+                            value = "INVOKE", target = "Lnet/minecraft/server/level/ServerLevel;setBlock(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;I)Z"
+                    ),
+                    // NeoForge moves the block removal into this method
+                    @At(
+                            value = "INVOKE", target = "Lnet/minecraft/world/level/block/state/BlockState;onBlockExploded(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/Explosion;)V"
+                    )
+            }
     )
     private void ledgerBlockExplodeCallback(BlockState state, ServerLevel world, BlockPos pos, Explosion explosion, BiConsumer<ItemStack, BlockPos> stackMerger, CallbackInfo ci) {
         LivingEntity entity;

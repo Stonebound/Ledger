@@ -27,14 +27,14 @@ public abstract class ItemEntityMixin extends Entity {
     }
 
     @Inject(method = "playerTouch", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Inventory;add(Lnet/minecraft/world/item/ItemStack;)Z"))
-    public void storeItemStack(Player player, CallbackInfo ci, @Local ItemStack itemStack, @Share("originalItemStack") LocalRef<ItemStack> originalItemStackRef) {
+    public void storeItemStack(Player player, CallbackInfo ci, @Local(ordinal = 0) ItemStack itemStack, @Share("originalItemStack") LocalRef<ItemStack> originalItemStackRef) {
         originalItemStackRef.set(itemStack.copy());
     }
 
     // insertStack modifies the ItemStack instance of the ItemEntity
     // The player may not be able to pick up all items from the stack
     @Inject(method = "playerTouch", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Inventory;add(Lnet/minecraft/world/item/ItemStack;)Z", shift = At.Shift.AFTER))
-    private void logPlayerItemPickUp(Player player, CallbackInfo ci, @Local ItemStack modifiedItemStack, @Share("originalItemStack") LocalRef<ItemStack> originalItemStackRef) {
+    private void logPlayerItemPickUp(Player player, CallbackInfo ci, @Local(ordinal = 0) ItemStack modifiedItemStack, @Share("originalItemStack") LocalRef<ItemStack> originalItemStackRef) {
         var originalItemStack = originalItemStackRef.get();
 
         int modifiedCount = modifiedItemStack.getCount();

@@ -23,7 +23,8 @@
         ]
     },
     "mixins": [
-        "ledger.mixins.json"
+        "ledger.mixins.json",
+        "ledger.fabric.mixins.json"
     ],
     "depends": {
         "fabricloader": ">=0.18.4",

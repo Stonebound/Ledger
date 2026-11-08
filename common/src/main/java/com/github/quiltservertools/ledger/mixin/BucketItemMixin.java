@@ -29,16 +29,16 @@ public abstract class BucketItemMixin {
     @Final
     private Fluid content;
 
-    @Inject(method = "emptyContents", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;destroyBlock(Lnet/minecraft/core/BlockPos;Z)Z"))
-    private void logFluidBreak(LivingEntity user, Level world, BlockPos pos, BlockHitResult hitResult, CallbackInfoReturnable<Boolean> cir) {
+    @Inject(method = "emptyContents*", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;destroyBlock(Lnet/minecraft/core/BlockPos;Z)Z"))
+    private void logFluidBreak(CallbackInfoReturnable<Boolean> cir, @Local(argsOnly = true) LivingEntity user, @Local(argsOnly = true) Level world, @Local(argsOnly = true) BlockPos pos) {
         var blockstate = world.getBlockState(pos);
         if (!blockstate.isAir() && user instanceof Player player) {
             BlockBreakCallback.EVENT.invoker().breakBlock(world, pos, world.getBlockState(pos), world.getBlockEntity(pos), Sources.FLUID, player);
         }
     }
 
-    @Inject(method = "emptyContents", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/BucketItem;playEmptySound(Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/level/LevelAccessor;Lnet/minecraft/core/BlockPos;)V"))
-    private void logFluidPlace(LivingEntity user, Level world, BlockPos pos, BlockHitResult hitResult, CallbackInfoReturnable<Boolean> cir) {
+    @Inject(method = "emptyContents*", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/BucketItem;playEmptySound(Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/level/LevelAccessor;Lnet/minecraft/core/BlockPos;)V"))
+    private void logFluidPlace(CallbackInfoReturnable<Boolean> cir, @Local(argsOnly = true) LivingEntity user, @Local(argsOnly = true) Level world, @Local(argsOnly = true) BlockPos pos) {
         if (user instanceof Player player) {
             BlockPlaceCallback.EVENT.invoker().place(world, pos, this.content.defaultFluidState().createLegacyBlock(), null, player);
         } else {
@@ -47,14 +47,14 @@ public abstract class BucketItemMixin {
     }
 
     @Inject(
-            method = "emptyContents",
+            method = "emptyContents*",
             at = @At(
                     value = "INVOKE",
                     target = "Lnet/minecraft/world/item/BucketItem;playEmptySound(Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/level/LevelAccessor;Lnet/minecraft/core/BlockPos;)V",
                     ordinal = 0
             )
     )
-    private void logWaterlog(LivingEntity user, Level world, BlockPos pos, BlockHitResult hitResult, CallbackInfoReturnable<Boolean> cir, @Local BlockState blockState) {
+    private void logWaterlog(CallbackInfoReturnable<Boolean> cir, @Local(argsOnly = true) LivingEntity user, @Local(argsOnly = true) Level world, @Local(argsOnly = true) BlockPos pos, @Local BlockState blockState) {
         if (user instanceof Player player) {
             BlockChangeCallback.EVENT.invoker().changeBlock(
                     world,

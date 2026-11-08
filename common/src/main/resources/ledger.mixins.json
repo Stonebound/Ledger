@@ -98,7 +98,6 @@
         "entities.MobMixin",
         "entities.RavagerMixin",
         "entities.ServerPlayerMixin",
-        "entities.SheepMixin",
         "entities.SnowGolemMixin",
         "entities.WolfMixin",
         "entities.silverfish.CallForHelpGoalMixin",

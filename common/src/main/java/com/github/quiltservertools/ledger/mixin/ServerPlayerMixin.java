@@ -18,13 +18,13 @@ import java.util.OptionalInt;
 public abstract class ServerPlayerMixin {
 
     @Inject(
-            method = "openMenu",
+            method = "openMenu*",
             at = @At(
                     value = "INVOKE",
                     target = "Lnet/minecraft/server/level/ServerPlayer;initMenu(Lnet/minecraft/world/inventory/AbstractContainerMenu;)V"
             )
     )
-    public void addPositionContext(MenuProvider factory, CallbackInfoReturnable<OptionalInt> cir, @Local AbstractContainerMenu screenHandler) {
+    public void addPositionContext(CallbackInfoReturnable<OptionalInt> cir, @Local(argsOnly = true) MenuProvider factory, @Local AbstractContainerMenu screenHandler) {
         if (factory instanceof BlockEntity blockEntity) {
             ((HandlerWithContext) screenHandler).setPos(blockEntity.getBlockPos());
         }

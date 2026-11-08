@@ -5,7 +5,7 @@ import com.github.quiltservertools.ledger.utility.Sources;
 import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.CampfireBlock;
-import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.CampfireBlockEntity;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Projectile;
@@ -35,7 +35,7 @@ public abstract class CampfireBlockMixin {
     @Inject(method = "useItemOn", at = @At(value = "INVOKE",
             target = "Lnet/minecraft/world/entity/player/Player;awardStat(Lnet/minecraft/resources/Identifier;)V")
     )
-    public void logCampfireAddItem(ItemStack itemStack, BlockState blockState, Level world, BlockPos pos, Player player, InteractionHand hand, BlockHitResult blockHitResult, CallbackInfoReturnable<InteractionResult> cir, @Local BlockEntity oldBlockEntity) {
+    public void logCampfireAddItem(ItemStack itemStack, BlockState blockState, Level world, BlockPos pos, Player player, InteractionHand hand, BlockHitResult blockHitResult, CallbackInfoReturnable<InteractionResult> cir, @Local CampfireBlockEntity oldBlockEntity) {
         BlockChangeCallback.EVENT.invoker().changeBlock(world, pos, blockState, world.getBlockState(pos), oldBlockEntity, world.getBlockEntity(pos), Sources.INSERT, player);
     }
 

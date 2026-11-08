@@ -1,0 +1,12 @@
+{
+    "required": true,
+    "package": "com.github.quiltservertools.ledger.neoforge.mixin",
+    "mixins": [
+        "ServerCommonPacketListenerImplMixin",
+        "ServerPlayerGameModeMixin",
+        "ShearsItemMixin"
+    ],
+    "injectors": {
+        "defaultRequire": 1
+    }
+}

@@ -22,4 +22,4 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "ledger"
-include("common", "fabric")
+include("common", "fabric", "neoforge", "toml4j-module")

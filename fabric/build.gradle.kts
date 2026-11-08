@@ -34,6 +34,11 @@ loom {
     //serverOnlyMinecraftJar()
 
     runs {
+        named("server") {
+            vmArg("-Dledger.auditMixins=true")
+            vmArg("-Dmixin.debug.verify=true")
+            vmArg("-Dmixin.debug.countInjections=true")
+        }
         create("testmodClient") {
             client()
             ideConfigGenerated(project.rootProject == project)

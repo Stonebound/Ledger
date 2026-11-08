@@ -30,6 +30,7 @@ import net.minecraft.server.MinecraftServer
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
 import org.jetbrains.exposed.v1.core.vendors.SQLiteDialect
+import org.spongepowered.asm.mixin.MixinEnvironment
 import java.nio.file.Files
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
@@ -117,6 +118,15 @@ object Ledger : CoroutineScope {
                     "Database drain timed out. ${ActionQueueService.size} actions still in queue. Data may be lost.",
                 )
             }
+        }
+    }
+
+    /** Applies every mixin up front so failures show at startup. Only runs with -Dledger.auditMixins=true. */
+    fun auditMixinsIfRequested() {
+        if (java.lang.Boolean.getBoolean("ledger.auditMixins")) {
+            logInfo("Mixin audit starting")
+            MixinEnvironment.getCurrentEnvironment().audit()
+            logInfo("Mixin audit finished")
         }
     }
 

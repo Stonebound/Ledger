@@ -1,4 +1,4 @@
-package com.github.quiltservertools.ledger.mixin.entities;
+package com.github.quiltservertools.ledger.fabric.mixin;
 
 import com.github.quiltservertools.ledger.callbacks.EntityModifyCallback;
 import com.github.quiltservertools.ledger.utility.NbtUtils;
