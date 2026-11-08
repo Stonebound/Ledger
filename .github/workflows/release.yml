@@ -7,6 +7,8 @@ on:
 jobs:
     build:
         runs-on: ubuntu-latest
+        permissions:
+            contents: write
 
         steps:
             - uses: actions/checkout@v4
@@ -20,21 +22,13 @@ jobs:
             - name: Build release
               run: ./gradlew build
 
-            - name: Upload assets to GitHub, Modrinth and CurseForge
-              uses: Kir-Antipov/mc-publish@v3.3
+            - name: Run end-to-end tests
+              run: ./gradlew :neoforge:runGameTests :fabric:runGameTests
+
+            # GitHub only: this fork must not publish to upstream's Modrinth and CurseForge projects.
+            - name: Upload assets to the GitHub release
+              uses: softprops/action-gh-release@v2
               with:
-                modrinth-id: LVN9ygNV
-                modrinth-featured: false
-                modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
-
-                curseforge-id: 491137
-                curseforge-token: ${{ secrets.CF_API_TOKEN }}
-
-                github-token: ${{ secrets.GITHUB_TOKEN }}
-
-                loaders: |
-                    fabric
-                    quilt
-
                 files: |
-                  build/libs/!(*-@(dev-all|sources|javadoc)).jar
+                  neoforge/build/libs/ledger-neoforge-*[0-9].jar
+                  fabric/build/libs/ledger-*[0-9].jar

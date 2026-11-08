@@ -4,7 +4,12 @@ For a much better guide, visit our [wiki](https://quiltservertools.github.io/Led
 
 ## Ledger
 
-A world change logging tool for the Fabric modloader.
+A world change logging tool for Fabric and NeoForge.
+
+> **This is an unofficial fork** of [QuiltServerTools/Ledger](https://github.com/QuiltServerTools/Ledger) that adds NeoForge
+> support for Minecraft 26.1.2. Please report problems with it [here](https://github.com/Stonebound/Ledger/issues), not to
+> the Ledger team. On NeoForge, install it with [Kotlin for Forge](https://modrinth.com/mod/kotlin-for-forge) instead of
+> Fabric API and fabric-language-kotlin. The optional Ledger client mod isn't supported on NeoForge.
 
 Ledger can be found on Discord at https://discord.gg/GtwDTTr3pe
 
