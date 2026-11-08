@@ -54,8 +54,10 @@ object ServerTranslations {
 
         val result: MutableComponent = when {
             template != null -> format(template, args.orEmpty())
+
             contents is TranslatableContents && argsChanged ->
                 Component.translatableWithFallback(contents.key, contents.fallback, *args.orEmpty().toTypedArray())
+
             else -> MutableComponent.create(contents)
         }
         result.withStyle(style)
@@ -81,10 +83,12 @@ object ServerTranslations {
             position = matcher.end()
             when (matcher.group(2)) {
                 "%" -> result.append(Component.literal("%"))
+
                 "s" -> {
                     val index = matcher.group(1)?.let { it.toInt() - 1 } ?: nextArg++
                     result.append(argument(args.getOrNull(index)))
                 }
+
                 else -> result.append(Component.literal(matcher.group()))
             }
         }
