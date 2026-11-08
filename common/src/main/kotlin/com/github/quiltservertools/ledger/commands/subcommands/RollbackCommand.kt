@@ -6,6 +6,7 @@ import com.github.quiltservertools.ledger.commands.BuildableCommand
 import com.github.quiltservertools.ledger.commands.CommandConsts
 import com.github.quiltservertools.ledger.commands.arguments.SearchParamArgument
 import com.github.quiltservertools.ledger.database.DatabaseManager
+import com.github.quiltservertools.ledger.logWarn
 import com.github.quiltservertools.ledger.platform.Permissions
 import com.github.quiltservertools.ledger.utility.Context
 import com.github.quiltservertools.ledger.utility.LiteralNode
@@ -26,6 +27,8 @@ object RollbackCommand : BuildableCommand {
         )
         .build()
 
+    // Whatever goes wrong with one action, the rest of the rollback still has to happen.
+    @Suppress("TooGenericExceptionCaught")
     fun rollback(context: Context, params: ActionSearchParams): Int {
         val source = context.source
         params.ensureSpecific()
@@ -52,7 +55,13 @@ object RollbackCommand : BuildableCommand {
                 val fails = HashMap<String, Int>()
                 val actionIds = HashSet<Int>()
                 for (action in actions) {
-                    if (!action.rollback(context.source.server)) {
+                    val succeeded = try {
+                        action.rollback(context.source.server)
+                    } catch (e: Exception) {
+                        logWarn("Could not roll back action ${action.id} (${action.identifier} at ${action.pos})", e)
+                        false
+                    }
+                    if (!succeeded) {
                         fails[action.identifier] = fails.getOrPut(action.identifier) { 0 } + 1
                     } else {
                         actionIds.add(action.id)

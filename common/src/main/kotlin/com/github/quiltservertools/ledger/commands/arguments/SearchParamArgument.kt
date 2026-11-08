@@ -100,6 +100,7 @@ object SearchParamArgument {
         }
 
         val builder = ActionSearchParams.Builder()
+        var rangeUsesSourceWorld = false
 
         for (entry in result.entries()) {
             val param = entry.key
@@ -114,14 +115,7 @@ object SearchParamArgument {
                             BlockPos.containing(source.position).subtract(Vec3i(range, range, range)),
                             BlockPos.containing(source.position).offset(Vec3i(range, range, range)),
                         )
-                        val world = Negatable.allow(source.level.dimension().identifier())
-                        if (builder.worlds == null) {
-                            builder.worlds = mutableSetOf(world)
-                        } else {
-                            builder.worlds!!.add(
-                                world,
-                            )
-                        }
+                        rangeUsesSourceWorld = true
                     } else {
                         builder.bounds = ActionSearchParams.GLOBAL
                     }
@@ -195,6 +189,12 @@ object SearchParamArgument {
                     builder.rolledBack = rolledBack
                 }
             }
+        }
+
+        // A range means the source's own world, unless the search names a world itself.
+        if (rangeUsesSourceWorld && builder.worlds?.any { it.allowed } != true) {
+            val world = Negatable.allow(source.level.dimension().identifier())
+            builder.worlds = (builder.worlds ?: mutableSetOf()).apply { add(world) }
         }
 
         return builder.build()

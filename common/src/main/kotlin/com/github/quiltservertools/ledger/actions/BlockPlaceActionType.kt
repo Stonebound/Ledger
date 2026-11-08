@@ -30,13 +30,14 @@ class BlockPlaceActionType : BlockChangeActionType() {
         if (world != null) {
             val state = newBlockState(world.holderLookup(Registries.BLOCK))
             world.setBlockAndUpdate(pos, state)
-            if (state.hasBlockEntity()) {
+            val data = extraData
+            if (state.hasBlockEntity() && data != null) {
                 ProblemReporter.ScopedCollector({ "ledger:restore:block-place@$pos" }, LOGGER).use {
                     world.getBlockEntity(pos)?.loadWithComponents(
                         TagValueInput.create(
                             it,
                             server.registryAccess(),
-                            TagParser.parseCompoundFully(extraData!!),
+                            TagParser.parseCompoundFully(data),
                         ),
                     )
                 }

@@ -35,7 +35,9 @@ public abstract class BlockBehaviourMixin {
     )
     private void ledgerBlockExplodeCallback(BlockState state, ServerLevel world, BlockPos pos, Explosion explosion, BiConsumer<ItemStack, BlockPos> stackMerger, CallbackInfo ci) {
         LivingEntity entity;
-        if (explosion.getIndirectSourceEntity() instanceof PlayerCausable playerCausable && playerCausable.getCausingPlayer() != null) {
+        if (explosion.getDirectSourceEntity() instanceof PlayerCausable playerCausable && playerCausable.getCausingPlayer() != null) {
+            entity = playerCausable.getCausingPlayer();
+        } else if (explosion.getIndirectSourceEntity() instanceof PlayerCausable playerCausable && playerCausable.getCausingPlayer() != null) {
             entity = playerCausable.getCausingPlayer();
         } else {
             entity = explosion.getIndirectSourceEntity();

@@ -31,14 +31,16 @@ open class BlockChangeActionType : AbstractActionType() {
     override fun rollback(server: MinecraftServer): Boolean {
         val world = server.getWorld(world)
         world?.setBlockAndUpdate(pos, oldBlockState(world.holderLookup(Registries.BLOCK)))
-        ProblemReporter.ScopedCollector({ "ledger:rollback:block-change@$pos" }, LOGGER).use {
-            world?.getBlockEntity(pos)?.loadWithComponents(
-                TagValueInput.create(
-                    it,
-                    server.registryAccess(),
-                    TagParser.parseCompoundFully(extraData!!),
-                ),
-            )
+        extraData?.let { data ->
+            ProblemReporter.ScopedCollector({ "ledger:rollback:block-change@$pos" }, LOGGER).use {
+                world?.getBlockEntity(pos)?.loadWithComponents(
+                    TagValueInput.create(
+                        it,
+                        server.registryAccess(),
+                        TagParser.parseCompoundFully(data),
+                    ),
+                )
+            }
         }
         world?.chunkSource?.blockChanged(pos)
 

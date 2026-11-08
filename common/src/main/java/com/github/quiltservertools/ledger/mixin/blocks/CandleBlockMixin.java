@@ -39,7 +39,8 @@ public abstract class CandleBlockMixin {
         }
     }
 
-    @Inject(method = "onProjectileHit", at = @At(value = "RETURN"))
+    @Inject(method = "onProjectileHit", at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/world/level/block/AbstractCandleBlock;setLit(Lnet/minecraft/world/level/LevelAccessor;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/BlockPos;Z)V"))
     private void ledgerLogCandleLit(Level world, BlockState state, BlockHitResult hit, Projectile projectile, CallbackInfo ci) {
         BlockChangeCallback.EVENT.invoker().changeBlock(
                 world,

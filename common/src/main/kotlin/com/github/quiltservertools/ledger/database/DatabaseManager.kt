@@ -148,9 +148,20 @@ object DatabaseManager {
             }
             Tables.Player.all().forEach {
                 cache.playerKeys[it.playerId] = it.id.value
-                cache.playernameKeys.forcePut(it.playerName, it.id.value)
+                cache.playerNames[it.id.value] = it.playerName
             }
         }
+    }
+
+    /** Replaces the cache with what's saved. After a failed transaction it can hold ids that were never saved. */
+    suspend fun reloadCache() {
+        cache.actionIdentifierKeys.clear()
+        cache.worldIdentifierKeys.clear()
+        cache.objectIdentifierKeys.clear()
+        cache.sourceKeys.clear()
+        cache.playerKeys.clear()
+        cache.playerNames.clear()
+        setupCache()
     }
 
     suspend fun autoPurge() {
@@ -226,7 +237,6 @@ object DatabaseManager {
         val objectIdentifierCache = DatabaseCacheService.objectIdentifierKeys.inverse()
         val sourceCache = DatabaseCacheService.sourceKeys.inverse()
         val playerCache = DatabaseCacheService.playerKeys.inverse()
-        val playerNameCache = DatabaseCacheService.playernameKeys.inverse()
 
         for (action in query) {
             val typeSupplier = ActionRegistry.getType(
@@ -248,7 +258,7 @@ object DatabaseManager {
             type.oldObjectState = action[Tables.Actions.oldBlockState]
             type.sourceName = sourceCache[action[Tables.Actions.sourceName].value]!!
             type.sourceProfile = action.getOrNull(Tables.Actions.sourcePlayer)?.let {
-                NameAndId(playerCache[it.value]!!, playerNameCache[it.value]!!)
+                NameAndId(playerCache[it.value]!!, cache.playerNames[it.value]!!)
             }
             type.extraData = action[Tables.Actions.extraData]
             type.rolledBack = action[Tables.Actions.rolledBack]
@@ -490,7 +500,7 @@ object DatabaseManager {
             this[Tables.Actions.blockState] = action.objectState
             this[Tables.Actions.oldBlockState] = action.oldObjectState
             this[Tables.Actions.sourceName] = getOrCreateSourceId(action.sourceName)
-            this[Tables.Actions.sourcePlayer] = action.sourceProfile?.let { getOrCreatePlayerId(it.id) }
+            this[Tables.Actions.sourcePlayer] = action.sourceProfile?.let { getOrCreatePlayerId(it) }
             this[Tables.Actions.extraData] = action.extraData
         }
     }
@@ -501,14 +511,14 @@ object DatabaseManager {
         if (player != null) {
             player.lastJoin = Instant.now()
             player.playerName = name
-            cache.playernameKeys.forcePut(name, player.id.value)
+            cache.playerNames[player.id.value] = name
         } else {
             val entity = Tables.Player.new {
                 this.playerId = uuid
                 this.playerName = name
             }
             cache.playerKeys[uuid] = entity.id.value
-            cache.playernameKeys.forcePut(name, entity.id.value)
+            cache.playerNames[entity.id.value] = name
         }
     }
 
@@ -602,8 +612,23 @@ object DatabaseManager {
         ].id.value.also { cache.put(obj!!, it) }
     }
 
-    private fun getOrCreatePlayerId(playerId: UUID): Int =
-        getOrCreateObjectId(playerId, cache.playerKeys, Tables.Player, Tables.Players, Tables.Players.playerId)
+    // An action can come from a player with no record yet: a fake player from another mod never joins,
+    // and a real one's record is saved in the background when they join.
+    private fun getOrCreatePlayerId(profile: NameAndId): Int {
+        getPlayerId(profile.id())?.let { id ->
+            cache.playerNames.getOrPut(id) { Tables.Player[id].playerName }
+            return id
+        }
+
+        val name = profile.name().take(MAX_PLAYER_NAME_LENGTH)
+        val id = Tables.Players.insertAndGetId {
+            it[playerId] = profile.id()
+            it[playerName] = name
+        }.value
+        cache.playerKeys[profile.id()] = id
+        cache.playerNames[id] = name
+        return id
+    }
 
     private fun getOrCreateSourceId(source: String): Int =
         getOrCreateObjectId(source, cache.sourceKeys, Tables.Source, Tables.Sources, Tables.Sources.name)

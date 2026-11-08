@@ -4,6 +4,7 @@ import com.google.common.collect.BiMap
 import com.google.common.collect.HashBiMap
 import net.minecraft.resources.Identifier
 import java.util.*
+import java.util.concurrent.ConcurrentHashMap
 
 object DatabaseCacheService {
     val actionIdentifierKeys: BiMap<String, Int> = HashBiMap.create()
@@ -16,5 +17,6 @@ object DatabaseCacheService {
 
     val playerKeys: BiMap<UUID, Int> = HashBiMap.create()
 
-    val playernameKeys: BiMap<String, Int> = HashBiMap.create()
+    // Not one-to-one: a player's old name can later belong to someone else.
+    val playerNames: MutableMap<Int, String> = ConcurrentHashMap()
 }

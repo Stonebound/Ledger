@@ -43,7 +43,8 @@ public abstract class SpongeBlockMixin {
     }
 
     @Inject(method = "tryAbsorbWater", at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/world/level/Level;setBlock(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;I)Z"))
+            target = "Lnet/minecraft/world/level/Level;setBlock(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;I)Z",
+            shift = At.Shift.AFTER))
     public void ledgerLogSpongeToWetSponge(Level world, BlockPos pos, CallbackInfo ci) {
         BlockState newBlockState = world.getBlockState(pos);
         if (oldBlockState == newBlockState) {return;} // if the sponge is already wet don't log

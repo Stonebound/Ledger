@@ -32,8 +32,8 @@ public abstract class BucketItemMixin {
     @Inject(method = "emptyContents*", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;destroyBlock(Lnet/minecraft/core/BlockPos;Z)Z"))
     private void logFluidBreak(CallbackInfoReturnable<Boolean> cir, @Local(argsOnly = true) LivingEntity user, @Local(argsOnly = true) Level world, @Local(argsOnly = true) BlockPos pos) {
         var blockstate = world.getBlockState(pos);
-        if (!blockstate.isAir() && user instanceof Player player) {
-            BlockBreakCallback.EVENT.invoker().breakBlock(world, pos, world.getBlockState(pos), world.getBlockEntity(pos), Sources.FLUID, player);
+        if (!blockstate.isAir()) {
+            BlockBreakCallback.EVENT.invoker().breakBlock(world, pos, blockstate, world.getBlockEntity(pos), Sources.FLUID, user instanceof Player player ? player : null);
         }
     }
 
