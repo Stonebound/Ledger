@@ -6,17 +6,24 @@ import net.minecraft.resources.Identifier
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
+// Reloading builds new maps and swaps them in, so a search running meanwhile never sees a half-filled one.
 object DatabaseCacheService {
-    val actionIdentifierKeys: BiMap<String, Int> = HashBiMap.create()
+    @Volatile
+    var actionIdentifierKeys: BiMap<String, Int> = HashBiMap.create()
 
-    val worldIdentifierKeys: BiMap<Identifier, Int> = HashBiMap.create()
+    @Volatile
+    var worldIdentifierKeys: BiMap<Identifier, Int> = HashBiMap.create()
 
-    val objectIdentifierKeys: BiMap<Identifier, Int> = HashBiMap.create()
+    @Volatile
+    var objectIdentifierKeys: BiMap<Identifier, Int> = HashBiMap.create()
 
-    val sourceKeys: BiMap<String, Int> = HashBiMap.create()
+    @Volatile
+    var sourceKeys: BiMap<String, Int> = HashBiMap.create()
 
-    val playerKeys: BiMap<UUID, Int> = HashBiMap.create()
+    @Volatile
+    var playerKeys: BiMap<UUID, Int> = HashBiMap.create()
 
     // Not one-to-one: a player's old name can later belong to someone else.
-    val playerNames: MutableMap<Int, String> = ConcurrentHashMap()
+    @Volatile
+    var playerNames: MutableMap<Int, String> = ConcurrentHashMap()
 }

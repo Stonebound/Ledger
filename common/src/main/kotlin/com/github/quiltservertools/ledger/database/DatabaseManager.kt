@@ -15,6 +15,7 @@ import com.github.quiltservertools.ledger.registry.ActionRegistry
 import com.github.quiltservertools.ledger.utility.Negatable
 import com.github.quiltservertools.ledger.utility.PlayerResult
 import com.google.common.collect.BiMap
+import com.google.common.collect.HashBiMap
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
@@ -65,6 +66,7 @@ import org.sqlite.SQLiteDataSource
 import java.time.Instant
 import java.time.temporal.ChronoUnit
 import java.util.*
+import java.util.concurrent.ConcurrentHashMap
 import java.util.function.Function
 import javax.sql.DataSource
 import kotlin.io.path.pathString
@@ -132,36 +134,31 @@ object DatabaseManager {
         logInfo("Tables created")
     }
 
+    /** Replaces the cache with what's saved. After a failed transaction it can hold ids that were never saved. */
     suspend fun setupCache() {
         execute {
-            Tables.ActionIdentifier.all().forEach {
-                cache.actionIdentifierKeys[it.identifier] = it.id.value
-            }
-            Tables.World.all().forEach {
-                cache.worldIdentifierKeys[it.identifier] = it.id.value
-            }
-            Tables.ObjectIdentifier.all().forEach {
-                cache.objectIdentifierKeys[it.identifier] = it.id.value
-            }
-            Tables.Source.all().forEach {
-                cache.sourceKeys[it.name] = it.id.value
-            }
+            val actionIdentifiers = HashBiMap.create<String, Int>()
+            Tables.ActionIdentifier.all().forEach { actionIdentifiers[it.identifier] = it.id.value }
+            val worlds = HashBiMap.create<Identifier, Int>()
+            Tables.World.all().forEach { worlds[it.identifier] = it.id.value }
+            val objectIdentifiers = HashBiMap.create<Identifier, Int>()
+            Tables.ObjectIdentifier.all().forEach { objectIdentifiers[it.identifier] = it.id.value }
+            val sources = HashBiMap.create<String, Int>()
+            Tables.Source.all().forEach { sources[it.name] = it.id.value }
+            val players = HashBiMap.create<UUID, Int>()
+            val playerNames = ConcurrentHashMap<Int, String>()
             Tables.Player.all().forEach {
-                cache.playerKeys[it.playerId] = it.id.value
-                cache.playerNames[it.id.value] = it.playerName
+                players[it.playerId] = it.id.value
+                playerNames[it.id.value] = it.playerName
             }
-        }
-    }
 
-    /** Replaces the cache with what's saved. After a failed transaction it can hold ids that were never saved. */
-    suspend fun reloadCache() {
-        cache.actionIdentifierKeys.clear()
-        cache.worldIdentifierKeys.clear()
-        cache.objectIdentifierKeys.clear()
-        cache.sourceKeys.clear()
-        cache.playerKeys.clear()
-        cache.playerNames.clear()
-        setupCache()
+            cache.actionIdentifierKeys = actionIdentifiers
+            cache.worldIdentifierKeys = worlds
+            cache.objectIdentifierKeys = objectIdentifiers
+            cache.sourceKeys = sources
+            cache.playerKeys = players
+            cache.playerNames = playerNames
+        }
     }
 
     suspend fun autoPurge() {

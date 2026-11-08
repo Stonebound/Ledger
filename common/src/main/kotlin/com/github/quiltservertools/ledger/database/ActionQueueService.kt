@@ -51,7 +51,7 @@ object ActionQueueService {
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
-            DatabaseManager.reloadCache()
+            DatabaseManager.setupCache()
             if (batch.size == 1) {
                 logWarn("Could not save an action, it has been lost: ${batch.single().identifier}", e)
             } else {
